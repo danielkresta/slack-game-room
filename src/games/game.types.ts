@@ -18,7 +18,7 @@ export enum GameState {
     Timeout,
 }
 
-export enum AvailableGame {
+export enum GameType {
     Foosball,
     AtariPong,
     // Darts,

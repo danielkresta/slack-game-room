@@ -1,7 +1,7 @@
 import { App, SlackCommandMiddlewareArgs, SlackActionMiddlewareArgs, BlockAction, Middleware, MessageAction, Context, SlashCommand } from "@slack/bolt";
 
 import { ALLOWED_CHANNELS, DEFAULT_GAME_TIMEOUT_MS } from "./configs";
-import { GameState, AvailableGame } from "./games/game.types";
+import { GameState, GameType } from "./games/game.types";
 import { TableFootball } from "./games/football.class";
 import { Game } from "./games/game.class";
 import { getGameRequestBlock, getPlayersBlock, getFinishedGameBlock } from "./blocks";
@@ -11,7 +11,7 @@ let games: {[id: string]: Game} = {};
 
 export const getGameCommandHandler: (
     app: App,
-    gameType: AvailableGame
+    gameType: GameType
 ) => Middleware<SlackCommandMiddlewareArgs> = (app, gameType) => {
     return async ({ ack, payload, context }) => {
         // Acknowledge the command request
@@ -40,7 +40,7 @@ export const getGameCommandHandler: (
         }
     
         switch (gameType) {
-            case AvailableGame.Foosball:
+            case GameType.Foosball:
                 game = new TableFootball(
                     // "someID",
                     creatorId,
@@ -48,7 +48,7 @@ export const getGameCommandHandler: (
                     DEFAULT_GAME_TIMEOUT_MS,
                 );
                 break;
-            case AvailableGame.AtariPong:
+            case GameType.AtariPong:
                 game = new AtariPong(
                     // "someID",
                     creatorId,
@@ -72,7 +72,7 @@ export const getGameCommandHandler: (
                     },
                 ],
                 // Text in the notification
-                text: 'Message from Test App'
+                text: 'New Relax room game request'
             });
             gameId = <string>result.ts;
             games[gameId] = game;
@@ -113,7 +113,7 @@ export const getFootballJoinActionHandler: (app: App) => Middleware<SlackActionM
                         type: "divider"
                     },
                 ],
-                text: 'Message from Test App'
+                text: 'Relax room game request updated'
             });
             // console.log(result);
         }
@@ -147,7 +147,7 @@ const sendFinishGameMessage: (
                         type: "divider"
                     },
                 ],
-                text: 'Message from Test App'
+                text: 'Relax room game request ended'
             });
         }
         catch (error) {

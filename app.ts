@@ -1,13 +1,7 @@
-// This example shows how to listen to a button click
-// It uses slash commands and actions
-
 import { App, MessageAction } from "@slack/bolt";
 import { getGameCommandHandler, getFootballJoinActionHandler, garbageCollector } from "./src/app-handlers";
-import { GARBAGE_COLLECTION_INTERVAL_MS, SLACK_COMMANDS } from "./src/configs";
-import { AvailableGame } from "./src/games/game.types";
-
-// Require the Bolt package (github.com/slackapi/bolt)
-// const { App } = require("@slack/bolt");
+import { GARBAGE_COLLECTION_INTERVAL_MS, SLACK_COMMANDS, SLACK_ACTION_IDS } from "./src/configs";
+import { GameType } from "./src/games/game.types";
 
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
@@ -19,13 +13,12 @@ const app = new App({
 });
 
 
-// Listen for a slash command invocation
-app.command(SLACK_COMMANDS.football, getGameCommandHandler(app, AvailableGame.Foosball));
-app.command(SLACK_COMMANDS.pong, getGameCommandHandler(app, AvailableGame.AtariPong));
+// Listen for a slash command invocations
+app.command(SLACK_COMMANDS.football, getGameCommandHandler(app, GameType.Foosball));
+app.command(SLACK_COMMANDS.pong, getGameCommandHandler(app, GameType.AtariPong));
 
-// Listen for a button invocation with action_id `button_abc`
-// You must set up a Request URL under Interactive Components on your app configuration page
-app.action<MessageAction>('button_abc', getFootballJoinActionHandler(app));
+// Listen for a actions
+app.action<MessageAction>(SLACK_ACTION_IDS.joinButton, getFootballJoinActionHandler(app));
 
 (async () => {
     // Start your app
@@ -35,4 +28,3 @@ app.action<MessageAction>('button_abc', getFootballJoinActionHandler(app));
 
     setInterval(garbageCollector, GARBAGE_COLLECTION_INTERVAL_MS);
 })();
-

@@ -1,5 +1,6 @@
 import { SectionBlock } from "@slack/types";
 import { Game } from "./games/game.class";
+import { SLACK_ACTION_IDS } from "./configs";
 
 export const getGameRequestBlock: (game: Game, addJoinButton: boolean) => SectionBlock = (game, addJoinButton) => {
     return {
@@ -16,7 +17,7 @@ export const getGameRequestBlock: (game: Game, addJoinButton: boolean) => Sectio
                     text: game?.messages?.joinButton,
                     emoji: true,
                 },
-                action_id: 'button_abc'
+                action_id: SLACK_ACTION_IDS.joinButton
             }
             : null,
     }

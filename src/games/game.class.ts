@@ -1,11 +1,13 @@
-import { GameState, PlayersLimit, GameMessage } from "./game.types";
-import { DEFAULT_GAME_TIMEOUT_MS, SLACK_COMMANDS } from "../configs";
+import { GameState, PlayersLimit, GameMessage, GameType } from "./game.types";
+import { DEFAULT_GAME_TIMEOUT_MS } from "../configs";
 
 export abstract class Game {
     public readonly created = Date.now();
+    public abstract readonly gameType: GameType;
     
     protected abstract readonly _gameIcon: string;
     protected abstract readonly _gameCommand: string;
+
     protected _state: GameState;
     protected _playersLimit: PlayersLimit = {
         min: null,
