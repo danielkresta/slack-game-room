@@ -4,7 +4,7 @@ export const ALLOWED_CHANNELS = [
 
 export const GARBAGE_COLLECTION_INTERVAL_MS = 1000 * 60 * 60;
 
-export const DEFAULT_GAME_TIMEOUT_MS = 1000 * 60 * 30;
+export const DEFAULT_GAME_TIMEOUT_MS = 1000 * 60 * 25;
 
 export const SLACK_COMMANDS = {
     football: "/helloworld",
