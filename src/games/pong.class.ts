@@ -10,7 +10,7 @@ export class AtariPong extends Game {
     
     constructor(
         creatorId: string,
-        stateUpdate: (state: GameState, game?: AtariPong) => void,
+        stateUpdate: (state: GameState, message: string) => void,
         timeout?: number,
     ) {
         super(
@@ -24,7 +24,6 @@ export class AtariPong extends Game {
     protected _getGameMessages(): GameMessage {
         return {
             created: `<@${this._creatorId}> wants to challenge anyone @here to a game of pong.`,
-            joinButton: `${this._gameIcon} Join`,
             finished: `${this._gameIcon} All the players for the game were found. You are ready to play some pong!`,
         }
     }

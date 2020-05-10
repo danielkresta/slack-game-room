@@ -1,5 +1,5 @@
-import { App, MessageAction } from "@slack/bolt";
-import { getGameCommandHandler, getFootballJoinActionHandler, garbageCollector } from "./src/app-handlers";
+import { App, MessageAction, BlockAction, ButtonAction } from "@slack/bolt";
+import { getGameCommandHandler, getJoinActionHandler, garbageCollector, getLeaveActionHandler } from "./src/app-handlers";
 import { GARBAGE_COLLECTION_INTERVAL_MS, SLACK_COMMANDS, SLACK_ACTION_IDS } from "./src/configs";
 import { GameType } from "./src/games/game.types";
 
@@ -13,12 +13,13 @@ const app = new App({
 });
 
 
-// Listen for a slash command invocations
+// Listen for slash command invocations
 app.command(SLACK_COMMANDS.football, getGameCommandHandler(app, GameType.Foosball));
 app.command(SLACK_COMMANDS.pong, getGameCommandHandler(app, GameType.AtariPong));
 
-// Listen for a actions
-app.action<MessageAction>(SLACK_ACTION_IDS.joinButton, getFootballJoinActionHandler(app));
+// Listen for actions
+app.action<MessageAction>(SLACK_ACTION_IDS.joinButton, getJoinActionHandler(app));
+app.action<BlockAction<ButtonAction>>(SLACK_ACTION_IDS.leaveButton, getLeaveActionHandler(app));
 
 (async () => {
     // Start your app

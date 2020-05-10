@@ -33,12 +33,12 @@ export const getPlayersBlock: (game: Game) => SectionBlock = (game) => {
     }
 }
 
-export const getFinishedGameBlock: (game: Game, timeout: boolean) => SectionBlock = (game, timeout) => {
+export const getFinishedGameBlock: (text: string) => SectionBlock = (text) => {
     return {
         type: 'section',
         text: {
             type: 'mrkdwn',
-            text: timeout ? game?.messages?.timeout : game?.messages?.finished,
+            text,
         },
     }
 }

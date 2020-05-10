@@ -12,5 +12,6 @@ export const SLACK_COMMANDS = {
 }
 
 export const SLACK_ACTION_IDS = {
-    joinButton: "game_join"
+    joinButton: "game_join",
+    leaveButton: "game_leave",
 }

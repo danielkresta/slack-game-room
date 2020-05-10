@@ -4,11 +4,14 @@ export interface PlayersLimit {
 }
 
 export interface GameMessage {
-    created: string,
-    joinButton: string,
+    created?: string,
+    joinButton?: string,
+    ephemeral?: string,
+    leaveButton?: string,
     players?: string,
     timeout?: string,
-    finished: string,
+    finished?: string,
+    empty?: string,
 }
 
 export enum GameState {
@@ -16,10 +19,11 @@ export enum GameState {
     Ready,
     Finished,
     Timeout,
+    Empty,
 }
 
 export enum GameType {
-    Foosball,
-    AtariPong,
-    // Darts,
+    Foosball = "foosball",
+    AtariPong = "pong",
+    // Darts = "darts",
 }
