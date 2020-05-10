@@ -5,13 +5,14 @@ export interface PlayersLimit {
 
 export interface GameMessage {
     created: string,
-    players: string,
-    timeout: string,
+    joinButton: string,
+    players?: string,
+    timeout?: string,
     finished: string,
 }
 
 export enum GameState {
-    Active,
+    Open,
     Ready,
     Finished,
     Timeout,

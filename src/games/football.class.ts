@@ -4,13 +4,13 @@ import { GameState, GameMessage } from "./game.types";
 export class TableFootball extends Game {
     
     constructor(
-        id: string,
+        // id: string,
         creatorId: string,
-        stateUpdate: (state: GameState) => void,
+        stateUpdate: (state: GameState, game: TableFootball) => void,
         timeout?: number,
     ) {
         super(
-            id,
+            // id,
             {min: 4, max: 4},
             creatorId,
             stateUpdate,
@@ -21,17 +21,8 @@ export class TableFootball extends Game {
     protected _getGameMessages(): GameMessage {
         return {
             created: `<@${this._creatorId}> wants to challenge anyone @here to a game of table football.`,
-            players: this._getPlayersMessage(),
-            timeout: "",
-            finished: "",
+            joinButton: ":soccer: Join",
+            finished: "All the players for the game were found. You are ready to play some football!",
         }
-    }
-
-    private _getPlayersMessage(): string {
-        return this._players.length
-            ? this._players.reduce(
-                (message, playerId) => message.concat(`<@${playerId}> `), 
-                "Joined: ")
-            : "";
     }
 }
