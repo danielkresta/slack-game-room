@@ -7,6 +7,7 @@ import { Game } from "./games/game.class";
 import { AtariPong } from "./games/pong.class";
 import { sendFinishGameMessage, sendNewGameMessage, sendEphemeralGameMessage, updateGameMessage } from "./messages";
 
+
 let games: {[id: string]: Game} = {};
 
 export const getGameCommandHandler: (
@@ -21,9 +22,10 @@ export const getGameCommandHandler: (
             return;
         }
     
+        const botToken = context.botToken;
+        const channelId = payload.channel_id;
         const creatorId = payload.user_id;
         const comment = payload.text;
-        const channelId = payload.channel_id;
     
         let game: Game;
         let gameId = "";
@@ -31,16 +33,17 @@ export const getGameCommandHandler: (
             switch (state) {
                 case GameState.Finished:
                     console.log("Game finished")
-                    sendFinishGameMessage(app, game, context.botToken, channelId, gameId, message);
+                    sendFinishGameMessage(app, game, botToken, channelId, gameId, message);
                     break;
 
                 case GameState.Timeout:
                     console.log("TIMEOUT");
-                    sendFinishGameMessage(app, game, context.botToken, channelId, gameId, message);
+                    sendFinishGameMessage(app, game, botToken, channelId, gameId, message);
+                    break;
                 
                 case GameState.Empty:
                     console.log("No players left");
-                    sendFinishGameMessage(app, game, context.botToken, channelId, gameId, message);
+                    sendFinishGameMessage(app, game, botToken, channelId, gameId, message);
                     break;
             }
         }
@@ -53,6 +56,7 @@ export const getGameCommandHandler: (
                     DEFAULT_GAME_TIMEOUT_MS,
                 );
                 break;
+
             case GameType.AtariPong:
                 game = new AtariPong(
                     creatorId,
@@ -62,10 +66,10 @@ export const getGameCommandHandler: (
                 break;
         }
     
-        sendNewGameMessage(app, game, context.botToken, payload.channel_id, creatorId).then(id => {
+        sendNewGameMessage(app, game, botToken, channelId, creatorId).then(id => {
             gameId = id;
             games[gameId] = game;
-            sendEphemeralGameMessage(app, game, context.botToken, channelId, gameId, creatorId);
+            sendEphemeralGameMessage(app, game, botToken, channelId, gameId, creatorId);
         });
     }
 }
@@ -75,6 +79,8 @@ export const getJoinActionHandler: (app: App) => Middleware<SlackActionMiddlewar
         // Acknowledge the button request
         ack();
         
+        const botToken = context.botToken;
+        const channelId = body.channel.id
         const userId = body.user.id;
         const gameId = body.message.ts;
         const game = games[gameId];
@@ -84,9 +90,9 @@ export const getJoinActionHandler: (app: App) => Middleware<SlackActionMiddlewar
         }
         game.addPlayer(userId);
 
-        updateGameMessage(app, game, context.botToken, body.channel.id, gameId);
+        updateGameMessage(app, game, botToken, channelId, gameId);
 
-        sendEphemeralGameMessage(app, game, context.botToken, body.channel.id, gameId, userId);
+        sendEphemeralGameMessage(app, game, botToken, channelId, gameId, userId);
     }
 }
 
@@ -95,6 +101,8 @@ export const getLeaveActionHandler: (app: App) => Middleware<SlackActionMiddlewa
         // Acknowledge the button request
         ack();
         
+        const botToken = context.botToken;
+        const channelId = body.channel.id;
         const userId = body.user.id;
         const gameId = body.actions[0].value;
         const game = games[gameId];
@@ -106,7 +114,7 @@ export const getLeaveActionHandler: (app: App) => Middleware<SlackActionMiddlewa
         context.updateConversation();
 
         if (game.players.length) {
-            updateGameMessage(app, game, context.botToken, body.channel.id, gameId);
+            updateGameMessage(app, game, botToken, channelId, gameId);
         }
 
         // remove ephemeral message
