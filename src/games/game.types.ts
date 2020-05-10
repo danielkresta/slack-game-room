@@ -17,3 +17,9 @@ export enum GameState {
     Finished,
     Timeout,
 }
+
+export enum AvailableGame {
+    Foosball,
+    AtariPong,
+    // Darts,
+}

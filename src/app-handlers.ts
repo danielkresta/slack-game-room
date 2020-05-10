@@ -1,14 +1,18 @@
 import { App, SlackCommandMiddlewareArgs, SlackActionMiddlewareArgs, BlockAction, Middleware, MessageAction, Context, SlashCommand } from "@slack/bolt";
 
 import { ALLOWED_CHANNELS, DEFAULT_GAME_TIMEOUT_MS } from "./configs";
-import { GameState } from "./games/game.types";
+import { GameState, AvailableGame } from "./games/game.types";
 import { TableFootball } from "./games/football.class";
 import { Game } from "./games/game.class";
 import { getGameRequestBlock, getPlayersBlock, getFinishedGameBlock } from "./blocks";
+import { AtariPong } from "./games/pong.class";
 
 let games: {[id: string]: Game} = {};
 
-export const getFootballCommandHandler: (app: App) => Middleware<SlackCommandMiddlewareArgs> = app => {
+export const getGameCommandHandler: (
+    app: App,
+    gameType: AvailableGame
+) => Middleware<SlackCommandMiddlewareArgs> = (app, gameType) => {
     return async ({ ack, payload, context }) => {
         // Acknowledge the command request
         ack();
@@ -21,8 +25,9 @@ export const getFootballCommandHandler: (app: App) => Middleware<SlackCommandMid
         const comment = payload.text;
         const channelId = payload.channel_id;
     
+        let game: Game;
         let gameId = "";
-        const onStateChange = (state: GameState, game: TableFootball) => {
+        const onStateChange = (state: GameState) => {
             switch (state) {
                 case GameState.Finished:
                     console.log("Game finished")
@@ -34,12 +39,24 @@ export const getFootballCommandHandler: (app: App) => Middleware<SlackCommandMid
             }
         }
     
-        const game = new TableFootball(
-            // "someID",
-            creatorId,
-            onStateChange,
-            DEFAULT_GAME_TIMEOUT_MS,
-        );
+        switch (gameType) {
+            case AvailableGame.Foosball:
+                game = new TableFootball(
+                    // "someID",
+                    creatorId,
+                    onStateChange,
+                    DEFAULT_GAME_TIMEOUT_MS,
+                );
+                break;
+            case AvailableGame.AtariPong:
+                game = new AtariPong(
+                    // "someID",
+                    creatorId,
+                    onStateChange,
+                    DEFAULT_GAME_TIMEOUT_MS,
+                );
+                break;
+        }
     
         try {
             const result = await app.client.chat.postMessage({

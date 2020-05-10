@@ -2,18 +2,18 @@ import { Game } from "./game.class";
 import { GameState, GameMessage } from "./game.types";
 import { SLACK_COMMANDS } from "../configs";
 
-export class TableFootball extends Game {
-
+export class AtariPong extends Game {
+    
     protected readonly _gameIcon = ":soccer:";
-    protected readonly _gameCommand = SLACK_COMMANDS.football;
+    protected readonly _gameCommand = SLACK_COMMANDS.pong;
     
     constructor(
         creatorId: string,
-        stateUpdate: (state: GameState, game?: TableFootball) => void,
+        stateUpdate: (state: GameState, game?: AtariPong) => void,
         timeout?: number,
     ) {
         super(
-            {min: 4, max: 4},
+            {min: 2, max: 2},
             creatorId,
             stateUpdate,
             timeout,
@@ -22,9 +22,9 @@ export class TableFootball extends Game {
 
     protected _getGameMessages(): GameMessage {
         return {
-            created: `<@${this._creatorId}> wants to challenge anyone @here to a game of table football.`,
+            created: `<@${this._creatorId}> wants to challenge anyone @here to a game of pong.`,
             joinButton: `${this._gameIcon} Join`,
-            finished: `${this._gameIcon} All the players for the game were found. You are ready to play some football!`,
+            finished: `${this._gameIcon} All the players for the game were found. You are ready to play some pong!`,
         }
     }
 }
