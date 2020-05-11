@@ -5,7 +5,7 @@ import { SLACK_COMMANDS } from "../configs";
 export class AtariPong extends Game {
     public readonly gameType = GameType.AtariPong;
 
-    protected readonly _gameIcon = ":soccer:";
+    protected readonly _gameIcon = ":atari:";
     protected readonly _gameCommand = SLACK_COMMANDS.pong;
     
     constructor(
