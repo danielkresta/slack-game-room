@@ -19,6 +19,7 @@ export const getGameCommandHandler: (
         ack();
     
         if (!ALLOWED_CHANNELS.includes(payload.channel_id)) {
+            console.log(`Command for ${gameType} called from invalid channel ${payload.channel_name} by ${payload.user_name}`);
             return;
         }
     
