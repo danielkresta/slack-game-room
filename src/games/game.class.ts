@@ -33,6 +33,7 @@ export abstract class Game {
 
         if (timeout != null && timeout > 0) {
             this._timeoutRef = setTimeout(() => {
+                console.log("TIMEOUT");
                 this._updateState(GameState.Timeout, this.messages.timeout);
             }, timeout);
         }
@@ -73,15 +74,17 @@ You can now create another game by typing ${this._gameCommand} in the channel.`,
 
     protected _checkPlayers() {
         // if (this._players.length === this._playersLimit.min) {
-        //     // ready?
+        //     console.log("Game ready");
         //     this._updateState(GameState.Ready);
         //     // handle ready
         // }
         if (this._players.length === this._playersLimit.max) {
+            console.log("Game finished");
             this._updateState(GameState.Finished, this.messages.finished);
             clearTimeout(this._timeoutRef);
         }
         if (this._players.length < 1) {
+            console.log("No players left");
             this._updateState(GameState.Empty, this.messages.empty);
             clearTimeout(this._timeoutRef);
         }

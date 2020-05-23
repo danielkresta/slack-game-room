@@ -33,41 +33,24 @@ export const getGameCommandHandler: (
         const onStateChange = (state: GameState, message: string) => {
             switch (state) {
                 case GameState.Finished:
-                    console.log("Game finished")
-                    sendFinishGameMessage(app, game, botToken, channelId, gameId, message);
-                    break;
-
                 case GameState.Timeout:
-                    console.log("TIMEOUT");
-                    sendFinishGameMessage(app, game, botToken, channelId, gameId, message);
-                    break;
-                
                 case GameState.Empty:
-                    console.log("No players left");
                     sendFinishGameMessage(app, game, botToken, channelId, gameId, message);
                     break;
             }
         }
-    
-        switch (gameType) {
-            case GameType.Foosball:
-                game = new TableFootball(
-                    creatorId,
-                    onStateChange,
-                    DEFAULT_GAME_TIMEOUT_MS,
-                );
-                break;
 
-            case GameType.AtariPong:
-                game = new AtariPong(
-                    creatorId,
-                    onStateChange,
-                    DEFAULT_GAME_TIMEOUT_MS,
-                );
-                break;
+        const existingGame = Object.entries(games)
+            .find(([gameId, game]) => (game.gameType === gameType && game.state === GameState.Open));
+        if (existingGame != null) {
+            [gameId, game] = existingGame;
+            const isSuccessful = joinExistingGame(app, game, botToken, channelId, gameId, creatorId);
+            if (isSuccessful) return;
         }
+
+        game = createNewGame(gameType, onStateChange, creatorId);
     
-        sendNewGameMessage(app, game, botToken, channelId, creatorId).then(id => {
+        sendNewGameMessage(app, game, botToken, channelId).then(id => {
             gameId = id;
             games[gameId] = game;
             sendEphemeralGameMessage(app, game, botToken, channelId, gameId, creatorId);
@@ -86,15 +69,50 @@ export const getJoinActionHandler: (app: App) => Middleware<SlackActionMiddlewar
         const gameId = body.message.ts;
         const game = games[gameId];
 
-        if (game == null) {
-            return;
-        }
-        game.addPlayer(userId);
-
-        updateGameMessage(app, game, botToken, channelId, gameId);
-
-        sendEphemeralGameMessage(app, game, botToken, channelId, gameId, userId);
+        joinExistingGame(app, game, botToken, channelId, gameId, userId);
     }
+}
+
+const createNewGame = (
+    gameType: GameType,
+    onStateChange: (state: GameState, message: string) => void,
+    creatorId: string,
+) => {
+    switch (gameType) {
+        case GameType.Foosball:
+            return new TableFootball(
+                creatorId,
+                onStateChange,
+                DEFAULT_GAME_TIMEOUT_MS,
+            );
+
+        case GameType.AtariPong:
+            return new AtariPong(
+                creatorId,
+                onStateChange,
+                DEFAULT_GAME_TIMEOUT_MS,
+            );
+    }
+}
+
+const joinExistingGame = (
+    app: App,
+    game: Game,
+    botToken: string,
+    channelId: string,
+    gameId: string,
+    userId: string,
+): boolean => {
+    if (game == null || game.state !== GameState.Open) {
+        return false;
+    }
+    game.addPlayer(userId);
+
+    updateGameMessage(app, game, botToken, channelId, gameId);
+
+    sendEphemeralGameMessage(app, game, botToken, channelId, gameId, userId);
+
+    return true;
 }
 
 export const getLeaveActionHandler: (app: App) => Middleware<SlackActionMiddlewareArgs<BlockAction<ButtonAction>>> = (app) => {

@@ -4,13 +4,12 @@ import { getGameRequestBlock, getPlayersBlock, getFinishedGameBlock } from "./bl
 import { SLACK_ACTION_IDS } from "./configs";
 
 
-export const sendNewGameMessage: (
+export const sendNewGameMessage = async (
     app: App,
     game: Game,
     botToken: string,
     channelId: string,
-    userId: string,
-) => Promise<string> = async (app, game, botToken, channelId, userId) => {
+): Promise<string> => {
     try {
         const result = await app.client.chat.postMessage({
             token: botToken,
@@ -34,13 +33,13 @@ export const sendNewGameMessage: (
     }
 }
 
-export const updateGameMessage: (
+export const updateGameMessage = async (
     app: App,
     game: Game,
     botToken: string,
     channelId: string,
     ts: string,
-) => void = async (app, game, botToken, channelId, ts) => {
+) => {
     try {
         // Update the message
         const result = await app.client.chat.update({
@@ -64,14 +63,14 @@ export const updateGameMessage: (
     }
 }
 
-export const sendFinishGameMessage: (
+export const sendFinishGameMessage = async (
     app: App,
     game: Game,
     botToken: string,
     channelId: string,
     ts: string,
     message: string,
-) => void = async (app, game, botToken, channelId, ts, message) => {
+) => {
     setTimeout(async () => {
         try {
             const result = await app.client.chat.update({
@@ -95,14 +94,14 @@ export const sendFinishGameMessage: (
     }, 100);
 }
 
-export const sendEphemeralGameMessage: (
+export const sendEphemeralGameMessage = async (
     app: App,
     game: Game,
     botToken: string,
     channelId: string,
     ts: string,
     userId: string,
-) => void = async (app, game, botToken, channelId, ts, userId) => {
+) => {
     try {
         const result = await app.client.chat.postEphemeral({
             token: botToken,
