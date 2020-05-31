@@ -1,13 +1,14 @@
 import { SectionBlock } from "@slack/types";
 import { Game } from "./games/game.class";
 import { SLACK_ACTION_IDS } from "./configs";
+import { GameState } from "./games/game.types";
 
-export const getGameRequestBlock: (game: Game, addJoinButton: boolean) => SectionBlock = (game, addJoinButton) => {
+export const getGameRequestBlock = (game: Game, addJoinButton: boolean): SectionBlock => {
     return {
         type: 'section',
         text: {
             type: 'mrkdwn',
-            text: game?.messages?.created,
+            text: game.state === GameState.Ready ? game.messages.ready : game.messages.created,
         },
         accessory: addJoinButton ? 
             {
@@ -23,7 +24,7 @@ export const getGameRequestBlock: (game: Game, addJoinButton: boolean) => Sectio
     }
 }
 
-export const getPlayersBlock: (game: Game) => SectionBlock = (game) => {
+export const getPlayersBlock = (game: Game): SectionBlock => {
     return {
         type: 'section',
         text: {
@@ -33,7 +34,7 @@ export const getPlayersBlock: (game: Game) => SectionBlock = (game) => {
     }
 }
 
-export const getFinishedGameBlock: (text: string) => SectionBlock = (text) => {
+export const getFinishedGameBlock = (text: string): SectionBlock => {
     return {
         type: 'section',
         text: {

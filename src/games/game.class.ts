@@ -33,8 +33,13 @@ export abstract class Game {
 
         if (timeout != null && timeout > 0) {
             this._timeoutRef = setTimeout(() => {
-                console.log("TIMEOUT");
-                this._updateState(GameState.Timeout, this.messages.timeout);
+                if (this._players.length < this._playersLimit.min) {
+                    console.log("TIMEOUT");
+                    this._updateState(GameState.Timeout, this.messages.timeout);
+                } else {
+                    console.log("TIMEOUT, but enough players");
+                    this._updateState(GameState.Finished, this.messages.finished);
+                }
             }, timeout);
         }
     }
@@ -53,6 +58,7 @@ export abstract class Game {
             players: this._getPlayersMessage(),
             timeout: `${this._gameIcon} It has been some time since <@${this._creatorId}> created the request, but not enough players joined, or they have just found the rest of the players offline.
 You can now create another game by typing ${this._gameCommand} in the channel.`,
+            ready: `Minimum number of players has joined the game, new ones can still join.`,
             joinButton: `${this._gameIcon} Join`,
             ephemeral: `You are currently queued for a game of ${this.gameType}`,
             leaveButton: `:x: Leave`,
@@ -60,33 +66,66 @@ You can now create another game by typing ${this._gameCommand} in the channel.`,
         }
     }
 
+    get isJoinable(): boolean {
+        return this._state === GameState.Open
+            || this._state === GameState.Ready
+    }
+
     public addPlayer(playerId: string): void {
-        if (/*this._players.includes(playerId) ||*/ this._state !== GameState.Open) return;
+        if (/*this._players.includes(playerId) ||*/ !this.isJoinable) return;
         this._players.push(playerId);
         this._checkPlayers();
     }
 
     public removePlayer(playerId: string) {
-        if (/*this._players.includes(playerId) ||*/ this._state !== GameState.Open) return;
+        if (/*this._players.includes(playerId) ||*/ !this.isJoinable) return;
         this._players = this._players.filter(id => playerId !== id);
         this._checkPlayers();
     }
 
+    public triggerStateCallback() {
+        switch (this._state) {
+            case GameState.Empty:
+                this._stateUpdateCallback(this._state, this._messages.empty);
+                return;
+            case GameState.Finished:
+                this._stateUpdateCallback(this._state, this._messages.finished);
+                return;
+            case GameState.Open:
+                this._stateUpdateCallback(this._state, this._messages.created);
+                return;
+            case GameState.Ready:
+                this._stateUpdateCallback(this._state, this._messages.ready);
+                return;
+            case GameState.Timeout:
+                this._stateUpdateCallback(this._state, this._messages.timeout);
+                return;
+        }
+        
+    }
+
     protected _checkPlayers() {
-        // if (this._players.length === this._playersLimit.min) {
-        //     console.log("Game ready");
-        //     this._updateState(GameState.Ready);
-        //     // handle ready
-        // }
         if (this._players.length === this._playersLimit.max) {
             console.log("Game finished");
             this._updateState(GameState.Finished, this.messages.finished);
             clearTimeout(this._timeoutRef);
+            return;
         }
         if (this._players.length < 1) {
             console.log("No players left");
             this._updateState(GameState.Empty, this.messages.empty);
             clearTimeout(this._timeoutRef);
+            return;
+        }
+        if (this._players.length < this._playersLimit.min) {
+            console.log("Game open");
+            this._updateState(GameState.Open, this.messages.created);
+            return;
+        }
+        if (this._players.length === this._playersLimit.min) {
+            console.log("Game ready");
+            this._updateState(GameState.Ready, this.messages.ready);
+            return;
         }
     }
 

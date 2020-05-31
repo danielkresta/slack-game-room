@@ -16,6 +16,7 @@ const app = new App({
 // Listen for slash command invocations
 app.command(SLACK_COMMANDS.football, getGameCommandHandler(app, GameType.Foosball));
 app.command(SLACK_COMMANDS.pong, getGameCommandHandler(app, GameType.AtariPong));
+app.command(SLACK_COMMANDS.darts, getGameCommandHandler(app, GameType.Darts));
 
 // Listen for actions
 app.action<MessageAction>(SLACK_ACTION_IDS.joinButton, getJoinActionHandler(app));

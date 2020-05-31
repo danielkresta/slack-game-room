@@ -1,11 +1,12 @@
 import { App, SlackCommandMiddlewareArgs, SlackActionMiddlewareArgs, BlockAction, Middleware, MessageAction, ButtonAction } from "@slack/bolt";
 
-import { ALLOWED_CHANNELS, DEFAULT_GAME_TIMEOUT_MS } from "./configs";
+import { ALLOWED_CHANNELS, DEFAULT_GAME_TIMEOUT_MS, DARTS_GAME_TIMEOUT_MS } from "./configs";
 import { GameState, GameType } from "./games/game.types";
 import { TableFootball } from "./games/football.class";
 import { Game } from "./games/game.class";
 import { AtariPong } from "./games/pong.class";
 import { sendFinishGameMessage, sendNewGameMessage, sendEphemeralGameMessage, updateGameMessage } from "./messages";
+import { Darts } from "./games/darts.class";
 
 
 let games: {[id: string]: Game} = {};
@@ -37,11 +38,22 @@ export const getGameCommandHandler: (
                 case GameState.Empty:
                     sendFinishGameMessage(app, game, botToken, channelId, gameId, message);
                     break;
+                case GameState.Ready:
+                case GameState.Open:
+                    updateGameMessage(app, game, botToken, channelId, gameId);
+                    break;
+
             }
         }
 
         const existingGame = Object.entries(games)
-            .find(([gameId, game]) => (game.gameType === gameType && game.state === GameState.Open));
+            .find(([gameId, game]) => (
+                game.gameType === gameType &&
+                (
+                    game.state === GameState.Open ||
+                    game.state === GameState.Ready
+                )
+            ));
         if (existingGame != null) {
             [gameId, game] = existingGame;
             const isSuccessful = joinExistingGame(app, game, botToken, channelId, gameId, creatorId);
@@ -58,7 +70,7 @@ export const getGameCommandHandler: (
     }
 }
 
-export const getJoinActionHandler: (app: App) => Middleware<SlackActionMiddlewareArgs<MessageAction>> = (app) => {
+export const getJoinActionHandler = (app: App): Middleware<SlackActionMiddlewareArgs<MessageAction>> => {
     return async ({ ack, body, context }) => {
         // Acknowledge the button request
         ack();
@@ -92,6 +104,13 @@ const createNewGame = (
                 onStateChange,
                 DEFAULT_GAME_TIMEOUT_MS,
             );
+
+        case GameType.Darts:
+            return new Darts(
+                creatorId,
+                onStateChange,
+                DARTS_GAME_TIMEOUT_MS,
+            );
     }
 }
 
@@ -103,7 +122,8 @@ const joinExistingGame = (
     gameId: string,
     userId: string,
 ): boolean => {
-    if (game == null || game.state !== GameState.Open) {
+    if (game == null && !game.isJoinable) {
+        game?.triggerStateCallback();
         return false;
     }
     game.addPlayer(userId);
