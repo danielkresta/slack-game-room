@@ -1,5 +1,5 @@
 import { GameState, PlayersLimit, GameMessage, GameType } from "./game.types";
-import { DEFAULT_GAME_TIMEOUT_MS } from "../configs";
+import { DEFAULT_GAME_TIMEOUT_MS, TEST_MODE } from "../configs";
 
 export abstract class Game {
     public readonly created = Date.now();
@@ -71,16 +71,23 @@ You can now create another game by typing ${this._gameCommand} in the channel.`,
             || this._state === GameState.Ready
     }
 
-    public addPlayer(playerId: string): void {
-        if (/*this._players.includes(playerId) ||*/ !this.isJoinable) return;
+    public addPlayer(playerId: string): boolean {
+        if (
+            (this._players.includes(playerId) && !TEST_MODE)
+            || !this.isJoinable
+        ) return false;
+
         this._players.push(playerId);
         this._checkPlayers();
+        return true;
     }
 
-    public removePlayer(playerId: string) {
-        if (/*this._players.includes(playerId) ||*/ !this.isJoinable) return;
+    public removePlayer(playerId: string): boolean {
+        if (!this.isJoinable) return false;
+
         this._players = this._players.filter(id => playerId !== id);
         this._checkPlayers();
+        return true;
     }
 
     public triggerStateCallback() {

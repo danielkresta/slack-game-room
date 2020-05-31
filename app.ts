@@ -16,14 +16,13 @@ const app = new App({
 // Listen for slash command invocations
 app.command(SLACK_COMMANDS.football, getGameCommandHandler(app, GameType.Foosball));
 app.command(SLACK_COMMANDS.pong, getGameCommandHandler(app, GameType.AtariPong));
-app.command(SLACK_COMMANDS.darts, getGameCommandHandler(app, GameType.Darts));
+// app.command(SLACK_COMMANDS.darts, getGameCommandHandler(app, GameType.Darts));
 
 // Listen for actions
 app.action<MessageAction>(SLACK_ACTION_IDS.joinButton, getJoinActionHandler(app));
 app.action<BlockAction<ButtonAction>>(SLACK_ACTION_IDS.leaveButton, getLeaveActionHandler(app));
 
 (async () => {
-    // Start your app
     await app.start(process.env.PORT || 3000);
 
     console.log('⚡️ Bolt app is running!');

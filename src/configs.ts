@@ -8,7 +8,7 @@ export const DEFAULT_GAME_TIMEOUT_MS = 1000 * 60 * 25;
 export const DARTS_GAME_TIMEOUT_MS = 1000 * 60 * 10;
 
 export const SLACK_COMMANDS = {
-    football: "/helloworld",
+    football: "/football",
     pong: "/atari",
     darts: "/darts",
 }
@@ -17,3 +17,5 @@ export const SLACK_ACTION_IDS = {
     joinButton: "game_join",
     leaveButton: "game_leave",
 }
+
+export const TEST_MODE = false;

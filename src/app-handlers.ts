@@ -126,13 +126,14 @@ const joinExistingGame = (
         game?.triggerStateCallback();
         return false;
     }
-    game.addPlayer(userId);
+    const success = game.addPlayer(userId);
 
-    updateGameMessage(app, game, botToken, channelId, gameId);
+    if (success) {
+        updateGameMessage(app, game, botToken, channelId, gameId);
+        sendEphemeralGameMessage(app, game, botToken, channelId, gameId, userId);
+    }
 
-    sendEphemeralGameMessage(app, game, botToken, channelId, gameId, userId);
-
-    return true;
+    return success;
 }
 
 export const getLeaveActionHandler: (app: App) => Middleware<SlackActionMiddlewareArgs<BlockAction<ButtonAction>>> = (app) => {
