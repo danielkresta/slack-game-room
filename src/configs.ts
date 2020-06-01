@@ -1,5 +1,6 @@
 export const ALLOWED_CHANNELS = [
     "G013AEBN8FL",  // gr-test
+    "GKB7VCTGV",  // brno_offline_gaming
 ];
 
 export const GARBAGE_COLLECTION_INTERVAL_MS = 1000 * 60 * 60;
