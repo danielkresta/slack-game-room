@@ -1,0 +1,16 @@
+{
+  "name": "brno-relax-room",
+  "version": "2.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "ts-node app.ts"
+  },
+  "dependencies": {
+    "@slack/bolt": "^3.12.1",
+    "dotenv": "^8.2.0",
+    "ts-node": "^8.10.1",
+    "typescript": "^3.8.3"
+  },
+  "license": "MIT"
+}
